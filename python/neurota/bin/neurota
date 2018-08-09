@@ -1,0 +1,99 @@
+#!/usr/bin/python
+
+import os
+import re
+import sys
+import time
+import math
+import pickle
+import datetime
+import optparse
+
+# add neurota modules to python path
+neurotalib_path = os.path.join(os.path.dirname(sys.argv[0]), "../src")
+sys.path.append(neurotalib_path)
+
+import Tools
+import DB
+
+import Commands.Add
+import Commands.Commas
+import Commands.Del
+import Commands.Dir
+import Commands.Edit
+import Commands.Help
+import Commands.Import
+import Commands.Journal
+import Commands.Quick
+import Commands.Search
+import Commands.Show
+import Commands.Table
+import Commands.Latex
+import Commands.Move
+import Commands.Rename
+import Commands.What
+
+########################################################################################
+# neurotadb is a micro database manager that has no dependencies other than Python     #
+# It can be used to store lists of items or single attributes to multiple tables with  #
+# date and time information.  It can be used for simple timestamped data logging or    #
+# complex heterogeneous micro db's can be grown organically through daily use.         #
+#                                                                                      #
+# The same command 'neurotadb' is used for each db action.                             #
+########################################################################################
+
+def ParseCommand(com, neurota):
+    neurota_cmds = {'add': Commands.Add.parse_add,
+                    'write': Commands.Add.parse_add,
+                    'del': Commands.Del.parse_del,
+                    'dir': Commands.Dir.parse_dir,
+                    'edit': Commands.Edit.parse_edit,
+                    'commas': Commands.Commas.parse_commas,
+                    'import': Commands.Import.parse_import,
+                    'journal': Commands.Journal.parse_journal,
+                    'latex': Commands.Latex.parse_latex,
+                    'move': Commands.Move.parse_move,
+                    'quick': Commands.Quick.parse_quick,
+                    'rename': Commands.Rename.parse_rename,
+                    'search': Commands.Search.parse_search,
+                    'table': Commands.Table.parse_table,
+                    'show': Commands.Show.parse_show,
+                    'what': Commands.What.parse_what,
+                    'help': Commands.Help.parse_help}
+
+    if com[0] not in neurota_cmds.keys():
+        Tools.display("%s is not a neurota command. Try [neurota help] to see list of commands." % com[0])
+    else:
+        neurota_cmds[com[0]](neurota, com[0], com[1:])
+
+def main():
+    option_parser = optparse.OptionParser()
+    option_parser.add_option('-d', '--db', dest='db_path', default="neurota_tmp",
+                             type='string', help='specify different db directory than ~/.neurota')
+    options, args = option_parser.parse_args()
+
+    # deal with the case where we are pointing to existing database (dir).
+
+    if not os.path.exists(options.db_path):
+        print "Creating: %s as neurota db dir." % options.db_path
+        os.mkdir(options.db_path)
+        Tools.display("Note: _neurota_ does not use any kind of config file.")
+        Tools.display("For separate databases you may consider adding the following to")
+        Tools.display("your .bashrc file: alias mydb='neurotadb -d %s '" % options.db_path)
+    else:
+        # directory already exists.
+        if not os.path.isdir(options.db_path):
+            Tools.display("%s exists but it is not a directory." % options.db_path)
+            Tools.display("Try again either with existing directory or directory that doesn't exist yet.")
+            sys.exit(1)
+
+    if len(args) > 0:
+        # We stash args along with db path in neurota object.
+        neurota = DB.NeurotaDB(options.db_path, ' '.join(args))
+        ParseCommand(args, neurota)
+    else:
+        Tools.display("Not enough commands.  Try [neurota help] to see list of commands.")
+
+main()
+
+

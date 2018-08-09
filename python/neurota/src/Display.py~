@@ -1,0 +1,167 @@
+# -------------------------------------------------------------------------
+#  File:    Display.py
+#  Created: Sat Jul 19 23:23:22 2014
+#  By:      Rick C <rick@raven>
+#  Comment: 
+# -------------------------------------------------------------------------
+
+import datetime
+import Tools
+import random
+
+def make_dashes(n):
+  return n*'-'
+
+def show_node(i, node, max_len, times=False, show_note=True):
+
+  if node.value:
+    item = "%s %s %s" % (node.item, Tools.color("is", "magenta"), node.value)
+  else:
+    item = "- %s -" % node.item
+    
+  if node.annotation:
+    # if a special annotation has been inserted for this node before display,
+    # show that instead of normal stuff.
+    print "       %d %s %s %s)" % (i, Tools.color("|", "magenta"),
+                                  node.annotation, item )
+  else:
+    if times:
+      print "       %d %s [%s] %s" % (i, Tools.color("|", "magenta"),
+                                       Tools.color(node.timestamp.strftime("%A %b %d %Y"), "green"), item )
+    else:
+      print "      %d %s %s" % (i, Tools.color("|", "magenta"), item)
+
+  # handle notes.
+      
+  if show_note:
+    # justified = Tools.justify(node.note, 40, "   ")
+    # for l in justified:
+    #   print "        %s" % Tools.red(l)
+    for l in node.note:
+      print  "          %s" % Tools.red(l)
+  else:
+    if node.note:
+      first_line = node.note[0]
+      portion = int(len(first_line)/1.8)
+      print "\t %s %s" % (Tools.color("note: ", "ured"), "<%s>" % first_line[0:portion])
+  
+
+def has_attributes(db, topic):
+
+  found_attributes = False
+  for table in db[topic].keys():
+    for node in db[topic][table]:
+      if node.value:
+        found_attributes = True
+        break
+
+  return found_attributes
+
+def display_topic_table(db, topic):
+
+  unique_attributes = set()
+  for table in db[topic].keys():
+    for node in db[topic][table]:
+      if node.value:
+        unique_attributes.add(node.item)
+
+  report = Tools.ReportMaker('_')
+  report.addColumn('object', 10)
+  for a in unique_attributes:
+    report.addColumn(a, 20)
+    
+  print report.getHeaders(),
+
+
+  for table in db[topic].keys():
+    vals_found = 0
+    columnlist = []
+    columnlist.append(table)
+    for a in unique_attributes:
+      columnval = "-"
+      for node in db[topic][table]:
+        if node.item == a:
+          columnval = node.value
+          vals_found += 1
+      columnlist.append(columnval)
+
+    if vals_found > 0:
+      print report.addData( columnlist ),
+  print report.getFooter(),
+
+  
+def show_topic(db, topic, hidden):
+
+  topic_has_attributes = has_attributes(db, topic)
+  if not hidden and topic_has_attributes:
+    display_topic_table(db, topic)
+  else:
+    num_tables_per_row = 8
+    num_dashes = 40 - len(topic)
+    dash_char = '_'
+
+    #num_div_dashes = 80
+    # print "%s" % Tools.bkwhite(dash_char*num_div_dashes)
+    print "%s%s" % (Tools.color(dash_char*5, "bkwhite"),
+                        Tools.color(" %s: " % topic, "blue"))
+    table_num = 1
+    for table in db[topic].keys():
+      if table_num % num_tables_per_row == 0:
+        print
+      full_table_name = "%s:%s" % (topic, table)
+      item_count = len(db[topic][table])
+      print " %s*%s" % (table, Tools.ucyan(str(item_count))),
+      if not hidden:
+        show_table(topic, table, db[topic][table], sort=False, times=False, show_notes=False)
+      table_num += 1
+  print
+  print
+
+def show_topic_hidden(db, topic):
+  show_topic(db, topic, True)
+
+def show_topic_expanded(db, topic):
+  show_topic(db, topic, False)
+
+def show_table(topic_name, table_name, table, sort=False, times=False, show_notes=True):
+  full_table_name = "%s:%s" % (topic_name, table_name)
+
+  print "  [-]",
+  print "%s" % Tools.color(full_table_name, "blue")
+  if sort:
+    table.sort(key=lambda l: l.item)
+    print "  <sorted>"
+
+  # find longest item.
+  max_len = 0
+  for node in table:
+    if len(node.item) > max_len: max_len = len(node.item)
+    
+  i = 0
+  for i in range(len(table)):
+    show_node(i+1, table[i], max_len+2, times, show_notes)
+  print
+
+
+def show_tree(db):
+  for topic in db.keys():
+    show_topic_hidden(db, topic)
+  print
+
+def show_banner(neurota):
+  
+  num_topics = len(neurota.db)
+  num_items  = 0
+  num_tables = 0
+  for topic in neurota.db.keys():
+    num_tables += len(neurota.db[topic])
+    for table in neurota.db[topic].keys():
+      num_items += len(neurota.db[topic][table])
+
+  print
+  timestamp = datetime.datetime.now()
+  timeform = "%A %B %d %Y"
+  stats = " topics: %d   tables: %d   items: %d" % (num_topics, num_tables, num_items)
+  print "%s %s | %s " % ("[neurota]",
+                          Tools.color(timestamp.strftime(timeform), "blue"), stats)
+  

@@ -1,0 +1,150 @@
+# -------------------------------------------------------------------------
+#  File:    Del.py
+#  Created: Sat Jul 19 23:29:00 2014
+#  By:      Rick C <rick@raven>
+#  Comment: 
+# -------------------------------------------------------------------------
+
+import sys
+
+import Display
+import Tools
+
+def parse_del(neurota, com_name, com):
+  
+  if len(com) == 1:
+
+    if ':' not in com[0]:
+      # deleting a whole topic
+      topic = com[0]
+      if topic not in neurota.db.keys():
+        Tools.display("topic: %s not found!" % topic)
+      else:
+        Tools.display("Topic %s will be REMOVED. %d tables left in topic." % (topic, len(neurota.db[topic])))
+        Display.show_topic_expanded(neurota.db, topic)
+        del_topic = Tools.yes_no("Are you sure you want to delete it?")
+        if del_topic:
+          del neurota.db[topic]
+          Tools.display("deleted topic: %s" % topic)
+          neurota.commit()
+        else:
+          Tools.display("topic %s not deleted" % topic)
+    else:
+        pieces = com[0].split(':')
+        if len(pieces) == 2:
+          topic, table = Tools.split_topic(com[0])
+          if topic not in neurota.db.keys():
+            Tools.display("topic: %s not found!" % Tools.color(topic, "green"))
+          else:
+            if table not in neurota.db[topic].keys():
+              Tools.display("table: %s not found!" % Tools.color(table, "green"))
+            else:
+              Tools.display("Table %s will be %s. %d items left in table." % (table, Tools.color("REMOVED", "red"),
+                                                                         len(neurota.db[topic][table])))
+              Display.show_table(topic, table, neurota.db[topic][table])
+              del_table = Tools.yes_no("Are you sure you want to delete it?")
+              if del_table:
+                del neurota.db[topic][table]
+                Tools.display("deleted table: %s:%s" % (topic, table))
+                if len(neurota.db[topic]) == 0:
+                  Tools.display('0 tables left in topic. Also deleting topic: %s' % topic)
+                  del neurota.db[topic]             
+                  neurota.commit()
+              else:
+                Tools.display("table %s:%s not deleted" % (topic, table))  
+        elif len(pieces) == 3:
+          if not pieces[2].startswith('#'):
+            Tools.display("list number must start with #.  E.g. topic:table:#2")
+          else:
+            # this code is redundant and needs to be combined w/ len(pieces) == 2
+            topic, table = Tools.split_topic(com[0])
+            if topic not in neurota.db.keys():
+              Tools.display("topic: %s not found!" % Tools.color(topic, "green"))
+            else:
+              if table not in neurota.db[topic].keys():
+                Tools.display("table: %s not found!" % Tools.color(table, "green"))
+              else:
+                index = int(pieces[2][1:])
+                if index > 0 and index <= len(neurota.db[topic][table]):
+                  del neurota.db[topic][table][index-1]
+                  num_items = len(neurota.db[topic][table])
+    
+                  # commit changes to db
+                  Tools.display('deleted # %d from %s:%s [%s now has %d item(s)]' % (index, topic, 
+                                                                           table, table, num_items))
+                  if num_items == 0:
+                    Tools.display('0 items left in table. Also deleting table: %s:%s' % (topic, table))
+                    del neurota.db[topic][table]
+
+                  neurota.commit()
+                else:
+                  Tools.display("# %d out of range!" % index)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      
+
+
+
+  elif len(com) == 3:
+    item = com[0]
+    topic, table = Tools.split_topic(com[2])
+    if table not in neurota.db[topic].keys():
+      Tools.display("table: %s not found!" % table)
+      sys.exit(1)
+
+    found = False
+    num_items = len(neurota.db[topic][table])
+
+    if item.startswith('['):
+      first_bracket = item.find('[')
+      second_bracket = item.find(']')
+      if first_bracket == -1 or second_bracket == -1:
+        Tools.display("Error: item number needs to be specified with [n].")
+        sys.exit(1)
+      
+      i = int(item[first_bracket+1:second_bracket]) - 1
+      if i > -1 and i < num_items:
+        found = True
+        item = neurota.db[topic][table][i].item
+    else:
+      # search and del item
+      i = 0
+      for i in range(num_items):
+        if neurota.db[topic][table][i].item == item:
+          found = True
+          break
+        else:
+          i += 1
+          
+    # if we found it, delete it.
+    if not found:
+      Tools.display("item: %s not found!" % item)
+    else:
+      del neurota.db[topic][table][i]
+      num_items = len(neurota.db[topic][table])
+    
+      # commit changes to db
+      Tools.display('deleted "%s" from %s:%s [%s now has %d item(s)]' % (item, topic, 
+                                                                         table, table, num_items))
+      if num_items == 0:
+        Tools.display('0 items left in table. Also deleting table: %s:%s' % (topic, table))
+        del neurota.db[topic][table]
+
+      neurota.commit()
+
+
+

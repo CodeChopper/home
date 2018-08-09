@@ -1,0 +1,59 @@
+
+  MonsterBattle Activity Log
+  started @ 2018-07-26T15:03:11.803631
+
+ Number of monsters loaded: 7
+  starting health of Pointer = 100
+  starting health of Pointer = 100
+  starting health of Pointer = 100
+  starting health of Freighter = 1000
+  starting health of Pointer = 100
+  starting health of Pointer = 100
+  starting health of Death Disk = 500
+
+ Number of monsters in locker room: 7
+
+00000000.20415 | Pointer rams into Death Disk with hull daggers
+00000000.22944 | Death Disk exterminates Pointer
+00000000.36190 | Pointer has died!
+00000002.338900 | Pointer rams into Freighter with hull daggers
+00000002.407819 | Freighter defends against Pointer with pulse canon
+00000002.410363 | Pointer rams into Freighter with hull daggers
+00000002.478871 | Freighter defends against Pointer with pulse canon
+00000002.746398 | Death Disk exterminates Pointer
+00000002.759245 | Pointer has died!
+00000006.880860 | Freighter defends against Pointer with pulse canon
+00000006.948802 | Pointer attacks Freighter with laser canons
+00000006.951171 | Freighter defends against Pointer with pulse canon
+00000007.20699 | Pointer rams into Freighter with hull daggers
+00000007.23265 | Freighter defends against Pointer with pulse canon
+00000009.265071 | Freighter defends against Pointer with pulse canon
+00000009.278918 | Pointer has died!
+00000010.646612 | Pointer attacks Freighter with laser canons
+00000010.714462 | Freighter defends against Pointer with pulse canon
+00000010.716753 | Pointer attacks Freighter with laser canons
+00000010.790701 | Pointer rams into Freighter with hull daggers
+00000010.859529 | Freighter defends against Pointer with pulse canon
+00000010.931362 | Freighter defends against Pointer with pulse canon
+00000010.944841 | Pointer has died!
+00000011.499573 | Pointer attacks Death Disk with laser canons
+00000011.502204 | Death Disk exterminates Pointer
+00000011.516326 | Pointer has died!
+00000012.135819 | Death Disk exterminates Freighter
+00000012.207079 | Death Disk exterminates Freighter
+00000012.276075 | Freighter defends against Death Disk with pulse canon
+00000012.278551 | Death Disk exterminates Freighter
+00000012.682550 | Freighter defends against Death Disk with pulse canon
+00000012.752411 | Freighter defends against Death Disk with pulse canon
+00000012.889308 | Death Disk exterminates Freighter
+00000012.960180 | Death Disk exterminates Freighter
+00000012.973567 | Freighter has died!
+
+
+ Winner is Death Disk
+ ________________________________________
+ Number of mutations: 0
+ Number of resurrections: 0
+ ________________________________________
+
+
