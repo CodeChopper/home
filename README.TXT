@@ -1,7 +1,6 @@
 
 Just some examples of personal lisp and python code done at home.
 
-- Rick
 
 ├── lisp: contains some lisp modules I wrote that are imported by
           projects or used interactively.
