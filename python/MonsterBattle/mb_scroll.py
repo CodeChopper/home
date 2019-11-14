@@ -1,7 +1,7 @@
 # -------------------------------------------------------------------------
 #  File:    mb_scroll.py
 #  Created: Thu May  4 21:05:43 2006
-#  By:      <rcdebaca@VectorSpace.sbcglobal.net>
+#  By: 
 #  Comment: This class handles printing to a window meant for scrolling.
 #
 #           Currently, it is not performing true scrolling with a buffer
